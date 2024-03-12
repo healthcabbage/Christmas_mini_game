@@ -1,14 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-
-    public bool isLive;
     [Header("# Game Data")]
     public int hp;
     public int stack;
+    public float gameSpeed;
+    public float mobSpeed;
+    public int score = 0;
+    public bool isPlay = false;
+    public float scorespeed;
+
+    public delegate void OnPlay(bool isplay);
+    public OnPlay onPlay;
+
+    bool check = false;
+
+    [Header("# GameObj")]
+    public GameObject playBtn;
+    public GameObject Over;
+    public GameObject Setting;
+    public GameData data;
 
     public static GameManager instance;
 
@@ -23,14 +38,63 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    void Start()
+
+    public void PlayBtnClick()
     {
-        hp = 3;
+        playBtn.SetActive(false);
+        isPlay = true;
+        onPlay.Invoke(isPlay);
+        StartCoroutine(AddScore());
+        AudioManager.instance.PlayBgm(AudioManager.Bgm.Stage);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void GameOver()
     {
-        
+        Over.SetActive(true);
+        data.star = score;
+        isPlay = false;
+        onPlay.Invoke(isPlay);
+        AudioManager.instance.StopBgm();
     }
+
+    public void Room()
+    {
+        //사운드
+
+        SceneManager.LoadScene("Room");
+    }
+
+    public void Replay()
+    {
+        //사운드
+
+        SceneManager.LoadScene("Maingame");
+    }
+
+    IEnumerator AddScore()
+    {
+        while(isPlay)
+        {
+            score++;
+            yield return new WaitForSeconds(scorespeed);
+        }
+    }
+
+    public void option()
+    {
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Button);
+        if (check == false)
+        {
+            Setting.SetActive(true);
+            Time.timeScale = 0;
+            check = true;
+        }
+        else
+        {
+            Setting.SetActive(false);
+            Time.timeScale = 1;
+            check = false;
+        }
+    }
+
 }

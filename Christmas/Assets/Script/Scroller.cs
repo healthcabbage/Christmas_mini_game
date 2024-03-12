@@ -5,15 +5,16 @@ using UnityEngine;
 public class Scroller : MonoBehaviour
 {
     public int count;
-    public float speedRate;
 
     void Start()
     {
         count = transform.childCount;
+        
     }
 
     void Update()
     {
-        transform.Translate(speedRate * Time.deltaTime * -1f, 0, 0);
+        if (GameManager.instance.isPlay)
+            transform.Translate(GameManager.instance.gameSpeed * Time.deltaTime * -1f, 0, 0);
     }
 }

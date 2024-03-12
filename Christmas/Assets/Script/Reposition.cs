@@ -10,6 +10,5 @@ public class Reposition : MonoBehaviour
             return;
 
         transform.Translate(24, 0, 0, Space.Self); 
-
     }
 }

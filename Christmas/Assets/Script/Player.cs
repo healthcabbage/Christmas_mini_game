@@ -5,18 +5,21 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     //애니메이션 현재 상태
-    public enum State { Idle, Run, Jump, Punch, Hit, Die };
+    public enum State { Idle, Run, Jump, Hit, Die };
     public float startJumpPower;
     public float jumpPower;
     public bool isGround;
     public bool isJumpkey;
     public bool isSlideKey = false;
     private float crouchHeight = 0.5f;
+    public float savespeed;
+    public float savesmobspeed;
+    public bool isDash = false;
 
     Transform t;
     Rigidbody2D rigid;
     Animator anim;
-    public GameObject punch_obj;
+
 
     void Awake()
     {
@@ -25,18 +28,24 @@ public class Player : MonoBehaviour
         t = GetComponent<Transform>();
     }
 
+    void Start()
+    {
+        if (!GameManager.instance.isPlay)
+            ChangeAnim(State.Idle);
+    }
     void Update()
     {
         // 기본 점프
-        if (Input.GetButtonDown("Jump") && isGround && !isSlideKey)
+        if (Input.GetButtonDown("Jump") && isGround && !isSlideKey && GameManager.instance.isPlay)
         {
             rigid.AddForce(Vector2.up * startJumpPower, ForceMode2D.Impulse);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.Jump);
         }
 
         isJumpkey = Input.GetButton("Jump");
 
         //슬라이드
-        if (Input.GetButtonDown("Slide") && isGround)
+        if (Input.GetButtonDown("Slide") && isGround && !isJumpkey && GameManager.instance.isPlay)
         {
             isSlideKey = Input.GetButtonDown("Slide");
             t.localScale = new Vector3(crouchHeight, crouchHeight, t.localScale.z);
@@ -64,10 +73,9 @@ public class Player : MonoBehaviour
     // 2. 착지 (물리 충돌 이벤트)
     void OnCollisionStay2D(Collision2D collision)
     {
-        if (!isGround)
+        if (!isGround && GameManager.instance.isPlay)
         {
             ChangeAnim(State.Run);
-            //사운드
             jumpPower = 1;
         }
 
@@ -77,29 +85,47 @@ public class Player : MonoBehaviour
     void OnCollisionExit2D(Collision2D collision)
     {
         ChangeAnim(State.Jump);
-        //사운드
         isGround = false;
     }
 
     //장애물 충돌
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Obstacle")
+        if (collision.tag == "Obstacle" && !isDash)
         {
             if (GameManager.instance.hp <= 0)
             {
                 ChangeAnim(State.Die);
+                AudioManager.instance.PlaySfx(AudioManager.Sfx.Dead);
                 rigid.simulated = false;
+                GameManager.instance.GameOver();
             }
             else
             {
+                AudioManager.instance.PlaySfx(AudioManager.Sfx.Hit);
                 GameManager.instance.hp--;
                 StartCoroutine(Hit());
             }
         }
-        else if (collision.tag == "giftbox")
+        else if (collision.tag == "giftbox" && !isDash)
         {
-
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.Dash);
+            collision.gameObject.SetActive(false);
+            Dash();
+        }
+        else if (collision.tag == "cake")
+        {
+            collision.gameObject.SetActive(false);
+            if (GameManager.instance.hp < 3)
+            {
+                AudioManager.instance.PlaySfx(AudioManager.Sfx.Hp);
+                GameManager.instance.hp++;
+            }
+            else
+            {
+                AudioManager.instance.PlaySfx(AudioManager.Sfx.Hpplus);
+                GameManager.instance.score += 10;
+            }
         }
     }
 
@@ -113,19 +139,38 @@ public class Player : MonoBehaviour
     IEnumerator Hit()
     {
         ChangeAnim(State.Hit);
-        //사운드
-
-
         yield return new WaitForSeconds(0.5f);
         ChangeAnim(State.Run);
     }
 
     void Dash()
     {
-        if (GameManager.instance.stack < 6)
+        if (GameManager.instance.stack <= 4)
+        {
             GameManager.instance.stack++;
-        else
-            GameManager.instance.stack = 0;
+
+            if (GameManager.instance.stack >= 5)
+            {
+                StartCoroutine(DashSpeed());
+            }
+        }
+    }
+
+    IEnumerator DashSpeed()
+    {
+        savespeed = GameManager.instance.gameSpeed;
+        savesmobspeed = GameManager.instance.mobSpeed;
+        GameManager.instance.gameSpeed = 10;
+        GameManager.instance.mobSpeed = 13;
+        GameManager.instance.scorespeed = 0.1f;
+        isDash = true;
+        AudioManager.instance.PlayBgm(AudioManager.Bgm.Dash);
+        yield return new WaitForSeconds(10f);
+        GameManager.instance.gameSpeed = savespeed;
+        GameManager.instance.mobSpeed = savesmobspeed;
+        GameManager.instance.stack = 0;
+        isDash = false;
+        AudioManager.instance.PlayBgm(AudioManager.Bgm.Stage);
     }
 
 }

@@ -21,16 +21,39 @@ public class RespawnManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(CreateMob());
+        GameManager.instance.onPlay += PlayGame;
+    }
+
+    void PlayGame(bool isplay)
+    {
+        if (isplay)
+            StartCoroutine(CreateMob());
+        else
+            StopAllCoroutines();
     }
 
     IEnumerator CreateMob()
     {
         while(true)
         {
-            MobPool[Random.Range(0, MobPool.Count)].SetActive(true);
+            MobPool[DeactiveMob()].SetActive(true);
             yield return new WaitForSeconds(Random.Range(1f, 3f));
         }
+    }
+
+    int DeactiveMob()
+    {
+        List<int> num = new List<int>();
+        for (int i = 0; i < MobPool.Count; i++)
+        {
+            if (!MobPool[i].activeSelf)
+                num.Add(i);
+        }
+
+        int x = 0;
+        if (num.Count > 0)
+            x = num[Random.Range(0, num.Count)];
+        return x;
     }
 
     GameObject CreateObj(GameObject obj, Transform parent)
