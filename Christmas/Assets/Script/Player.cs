@@ -16,6 +16,9 @@ public class Player : MonoBehaviour
     public float savesmobspeed;
     public bool isDash = false;
 
+    public bool isDead = false;
+    public bool isHit = false;
+
     Transform t;
     Rigidbody2D rigid;
     Animator anim;
@@ -48,15 +51,26 @@ public class Player : MonoBehaviour
         if (Input.GetButtonDown("Slide") && isGround && !isJumpkey && GameManager.instance.isPlay)
         {
             isSlideKey = Input.GetButtonDown("Slide");
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.Small);
             t.localScale = new Vector3(crouchHeight, crouchHeight, t.localScale.z);
             t.position = new Vector3(-6, -2.2f, 0);
         }
 
         if (Input.GetButtonUp("Slide"))
         {
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.Big);
             t.localScale = new Vector3(1f, 1f, t.localScale.z);
             t.position = new Vector3(-6, -1.8f, 0);
             isSlideKey = false;
+        }
+
+        if (GameManager.instance.hp <= 0 && !isDead)
+        {
+            ChangeAnim(State.Die);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.Dead);
+            rigid.simulated = false;
+            GameManager.instance.GameOver();
+            isDead = true;
         }
     }
 
@@ -91,16 +105,9 @@ public class Player : MonoBehaviour
     //장애물 충돌
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Obstacle" && !isDash)
+        if (collision.tag == "Obstacle" && !isDash && !isHit)
         {
-            if (GameManager.instance.hp <= 0)
-            {
-                ChangeAnim(State.Die);
-                AudioManager.instance.PlaySfx(AudioManager.Sfx.Dead);
-                rigid.simulated = false;
-                GameManager.instance.GameOver();
-            }
-            else
+            if (GameManager.instance.hp >= 0)
             {
                 AudioManager.instance.PlaySfx(AudioManager.Sfx.Hit);
                 GameManager.instance.hp--;
@@ -139,8 +146,10 @@ public class Player : MonoBehaviour
     IEnumerator Hit()
     {
         ChangeAnim(State.Hit);
+        isHit = true;
         yield return new WaitForSeconds(0.5f);
         ChangeAnim(State.Run);
+        isHit = false;
     }
 
     void Dash()
@@ -170,6 +179,7 @@ public class Player : MonoBehaviour
         GameManager.instance.mobSpeed = savesmobspeed;
         GameManager.instance.stack = 0;
         isDash = false;
+        GameManager.instance.scorespeed = 0.5f;
         AudioManager.instance.PlayBgm(AudioManager.Bgm.Stage);
     }
 

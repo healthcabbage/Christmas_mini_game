@@ -13,3 +13,11 @@ MonoBehaviour:
   m_Name: Data
   m_EditorClassIdentifier: 
   star: 0
+  isfloor: 0
+  isTree: 0
+  iswindow: 0
+  isgiftbox: 0
+  iscurtain: 0
+  issofa: 0
+  isemotion: 0
+  istutorial: 0

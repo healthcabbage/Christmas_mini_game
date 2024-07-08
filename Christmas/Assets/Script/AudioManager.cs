@@ -23,7 +23,7 @@ public class AudioManager : MonoBehaviour
 
     public enum Sfx { Dead, Hit, Dash, Talk, Hp, Button, Hpplus, Jump, buy, Small, Big }
 
-    public enum Bgm { Start, Stage, Dash, Shop, Story, End }
+    public enum Bgm { Start, Room, Stage, Dash, Shop, Story, End }
 
     void Awake()
     {

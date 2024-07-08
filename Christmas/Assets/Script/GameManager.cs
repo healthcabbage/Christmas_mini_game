@@ -60,14 +60,14 @@ public class GameManager : MonoBehaviour
     public void Room()
     {
         //사운드
-
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Button);
         SceneManager.LoadScene("Room");
     }
 
     public void Replay()
     {
         //사운드
-
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Button);
         SceneManager.LoadScene("Maingame");
     }
 
