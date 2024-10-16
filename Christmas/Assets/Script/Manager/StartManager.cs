@@ -30,17 +30,19 @@ public class StartManager : MonoBehaviour
 
     public void setting()
     {
-        if (check == false)
-        {
-            GameManager.instance.audiosystem.PlaySfx(AudioSystem.Sfx.Button);
-            option.SetActive(true);
-            check = true;
-        }
-        else
-        {
-            GameManager.instance.audiosystem.PlaySfx(AudioSystem.Sfx.Button);
-            option.SetActive(false);
-            check = false;
-        }
+        GameManager.instance.audiosystem.PlaySfx(AudioSystem.Sfx.Button);
+        GameManager.instance.ui.soundui();
+        //if (check == false)
+        //{
+        //    GameManager.instance.audiosystem.PlaySfx(AudioSystem.Sfx.Button);
+        //    GameManager.instance.ui.
+        //    check = true;
+        //}
+        //else
+        //{
+        //    GameManager.instance.audiosystem.PlaySfx(AudioSystem.Sfx.Button);
+        //    option.SetActive(false);
+        //    check = false;
+        //}
     }
 }

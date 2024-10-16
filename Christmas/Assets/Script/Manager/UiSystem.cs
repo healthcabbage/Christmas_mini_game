@@ -6,8 +6,16 @@ public class UiSystem : MonoBehaviour
 {
     public GameObject soundsettingui;
 
-    public void soundui(bool check)
+    public void soundui()
     {
+        if (soundsettingui.activeSelf == true)
+        {
+            soundsettingui.SetActive(false);
+        }
+        else
+        {
+            soundsettingui.SetActive(true);
+        }
 
     }
 }

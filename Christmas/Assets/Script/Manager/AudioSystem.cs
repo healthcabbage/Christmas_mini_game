@@ -77,5 +77,12 @@ public class AudioSystem : MonoBehaviour
     public void ToggleBgm()
     {
         bgmPlayer.mute = !bgmPlayer.mute;
+
+        for (int index = 0; index < sfxPlayers.Length; index++)
+        {
+            sfxPlayers[index].mute = !sfxPlayers[index].mute;
+        }
     }
+
+
 }

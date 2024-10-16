@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
     public SceneSystem scene;
     public AudioSystem audiosystem;
     public TextSystem texteffect;
+    public UiSystem ui;
 
 
     [Header("# Data")]
