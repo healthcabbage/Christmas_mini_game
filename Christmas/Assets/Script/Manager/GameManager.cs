@@ -34,10 +34,9 @@ public class GameManager : MonoBehaviour
     public UiSystem ui;
 
 
+    //데이트 관리
     [Header("# Data")]
     public GameData data;
-
-    // 데이터는 여기서 관리해주자, 
 
     void Awake()
     {
